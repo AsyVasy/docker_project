@@ -14,7 +14,7 @@ app.use(cors({
     origin: 'http://localhost:5173'
 }));
 
-app.use('/users', userRoutes);
+app.use('/api/users', userRoutes);
 
 // Connexion à MySQL
 const dbConfig = {
