@@ -1,0 +1,21 @@
+# Ignore les dépendances
+**/node_modules/
+
+# Ignore les fichiers de log
+*.log
+
+# Ignore les fichiers système
+.DS_Store
+Thumbs.db
+
+# Ignore les fichiers de build éventuels
+dist/
+build/
+
+# Ignore les fichiers d’environnement
+.env
+.env.local
+.env.*.local
+
+# Vite / React
+.vite/
