@@ -1,115 +1,162 @@
-# 🚀 Mon Projet Fullstack Dockerisé
+# 💻 Mon Projet - Fullstack Vite + Node.js + MySQL + Prisma
 
-Ce projet est une application web fullstack composée d’un **frontend en React (Vite)** et d’un **backend en Node.js (Express)**, connectés à une base de données **MySQL**, le tout orchestré via **Docker Compose**.
+Ce projet est une application **fullstack** avec un frontend en **React + Vite**, un backend en **Node.js + Express**, une base de données **MySQL**, et un ORM moderne : **Prisma**.
+
+Le tout est orchestré avec **Docker Compose** pour un environnement de développement reproductible, sans rien installer en local (pas même Node ou npm !).
 
 ---
 
-## 🧱 Structure du projet
+## 📦 Structure du projet
 
 ```
 mon-projet/
-├── backend/             # Serveur Express (Node.js)
-│   ├── app.js
-│   └── ...
-├── frontend/            # Application React (Vite)
+│
+├── frontend/        → Vite + React
 │   ├── src/
+│   ├── public/
 │   ├── index.html
-│   └── ...
-├── docker-compose.yml   # Configuration des services Docker
+│   ├── package.json
+│   └── vite.config.js
+│
+├── backend/         → Node.js + Express + Prisma
+│   ├── prisma/      → schema.prisma, migrations...
+│   ├── routes/
+│   ├── controllers/
+│   ├── app.js
+│   ├── package.json
+│   └── .env
+│
+├── docker-compose.yml
 ├── README.md
 └── .gitignore
 ```
 
 ---
 
-## 📦 Technologies utilisées
-
-- 🧠 **React (Vite)** – Frontend rapide & moderne
-- 🔧 **Express.js** – API backend
-- 🐬 **MySQL 8** – Base de données relationnelle
-- 🐳 **Docker & Docker Compose** – Conteneurisation
-- 🐙 **Git** – Versionnage (avec SSH recommandé)
-
----
-
-## 🚀 Lancer le projet en local
-
-> 💡 **Prérequis :** [Docker](https://www.docker.com/products/docker-desktop) installé sur ta machine.
+## 🚀 Démarrage rapide
 
 ```bash
-# 1. Cloner le projet
-git clone git@github.com:TON-UTILISATEUR/mon-projet.git
+git clone git@github.com:ton-utilisateur/mon-projet.git
 cd mon-projet
-
-# 2. Lancer tous les services
 docker compose up --build
 ```
 
-- Frontend : [http://localhost:5173](http://localhost:5173)
-- Backend : [http://localhost:3000](http://localhost:3000)
-- MySQL : port `3306` (voir identifiants plus bas)
+- Frontend → [http://localhost:5173](http://localhost:5173)
+- Backend  → [http://localhost:3000](http://localhost:3000)
+
+✅ **Hot reload** actif pour le frontend  
+✅ Backend relancé automatiquement via **nodemon**
 
 ---
 
-## 🔐 Configuration MySQL
+## 🔌 API Express
 
-Les variables d’environnement MySQL sont définies dans `docker-compose.yml` :
+Le backend expose une API sur le port `3000`, accessible depuis le frontend via un **proxy Vite** (`/api/...`).
 
-```yaml
-MYSQL_ROOT_PASSWORD: rootpassword
-MYSQL_DATABASE: myappdb
-MYSQL_USER: user
-MYSQL_PASSWORD: password
-```
+Tu peux ajouter tes routes dans `backend/routes/` et les connecter à tes contrôleurs.
 
-Tu peux te connecter à la base via un client comme **DBeaver**, **TablePlus**, ou en ligne de commande :
+---
+
+## 🧬 Base de données & ORM (Prisma)
+
+Le backend utilise **Prisma** comme ORM pour interagir avec une base **MySQL**.
+
+### 📁 Fichier principal
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u user -p
+backend/prisma/schema.prisma
 ```
+
+### 📌 Commandes utiles
+
+> Ces commandes doivent être lancées dans le conteneur `backend`.
+
+#### Créer une migration
+```bash
+docker compose exec backend npx prisma migrate dev --name init
+```
+
+#### Générer les types Prisma
+```bash
+docker compose exec backend npx prisma generate
+```
+
+#### Lancer Prisma Studio (GUI)
+```bash
+docker compose exec backend npx prisma studio
+```
+
+➡️ Par défaut, Prisma se connecte à :
+```
+mysql://user:password@db:3306/myappdb
+```
+
+La base est créée et gérée automatiquement au lancement du projet grâce à Docker.
 
 ---
 
-## 💻 Commandes utiles
+## ⚙️ Vite + React (Frontend)
+
+Le frontend est basé sur **Vite**, pour un développement rapide et fluide.
 
 ```bash
-# Lancer uniquement le frontend
-docker compose up frontend
+docker compose run frontend npm install   # Installer de nouvelles dépendances
+docker compose up frontend               # Lancer uniquement le frontend
+```
 
-# Lancer uniquement le backend
-docker compose up backend
+Vite utilise le **mode développement avec hot reload** accessible à :
+[http://localhost:5173](http://localhost:5173)
 
-# Rebuild complet (sans cache)
-docker compose build --no-cache
-
-# Accéder au terminal d'un conteneur (ex : frontend)
-docker compose exec frontend sh
+Le fichier `vite.config.js` configure un proxy vers le backend pour permettre des appels comme :
+```js
+fetch('/api/users')
 ```
 
 ---
 
-## 📁 .gitignore
+## 🐳 Docker & Docker Compose
 
-Le fichier `.gitignore` est configuré pour ignorer tous les `node_modules`, fichiers temporaires, variables d’environnement, etc.
+Le projet utilise `docker-compose.yml` pour tout lancer d'un coup.
 
----
+### 📁 Volumes persistants
 
-## 🛠️ Fonctionnalités prévues
+La base de données MySQL utilise un volume nommé `db_data` pour garder les données entre les redémarrages.
 
-- ✅ Hot reload côté frontend
-- ✅ Proxy entre frontend et backend
-- ✅ API REST avec Express
-- ✅ Stockage des données en MySQL
-- 🔄 (à venir) Authentification, formulaire, etc.
+### 🧼 Nettoyage
 
----
-
-## 🧠 Auteur
-
-Projet développé par **Lounes** – *auto-hébergé, sans `npm` installé en local 😎*
+```bash
+docker compose down -v --remove-orphans
+```
 
 ---
 
-## ☁️ Déploiement (optionnel)
+## 📂 .gitignore
 
-Ce projet peut être déployé sur un VPS ou sur des services comme **Render**, **Railway**, **Fly.io**, ou **Netlify + backend externe**.
+Le fichier `.gitignore` est configuré pour ignorer :
+- Tous les `node_modules` (frontend et backend)
+- Les fichiers de logs, dossiers `.next` ou `.env.local` éventuels
+- Les fichiers générés automatiquement
+
+---
+
+## ✅ À venir / TODO
+
+- Authentification (JWT, OAuth...)
+- Tests unitaires (Jest, Supertest...)
+- Déploiement automatique (Railway, Vercel, Fly.io...)
+
+---
+
+## 📚 Ressources utiles
+
+- [Prisma Docs](https://www.prisma.io/docs)
+- [Vite Docs](https://vitejs.dev/)
+- [Express Docs](https://expressjs.com/)
+- [MySQL Docs](https://dev.mysql.com/doc/)
+- [Docker Docs](https://docs.docker.com/)
+
+---
+
+## 🤝 Auteurs
+
+Ce projet a été démarré par **[AsyVasy](https://github.com/AsyVasy)** dans le but de créer une base fullstack moderne, simple à maintenir et facile à déployer.
